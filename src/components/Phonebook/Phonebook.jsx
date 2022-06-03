@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import actionCreators from 'redux/contacts/contactsActions';
-import { useSelector } from 'react-redux';
 import { getContacts } from 'redux/contacts/contactsSelector';
 
 const Phonebook = () => {
