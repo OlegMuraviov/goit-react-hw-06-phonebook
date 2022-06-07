@@ -1,66 +1,43 @@
-import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getContacts,
+  getFilteredContacts,
+} from 'redux/contacts/contactsSelector';
 import actionCreators from 'redux/contacts/contactsActions';
-import { getContacts } from 'redux/contacts/contactsSelector';
+
+import Form from 'components/Form/Form';
+import Filter from 'components/Filter/Filter';
+import ContactsList from 'components/ContactsList/ContactsList';
 
 const Phonebook = () => {
-  const [form, setForm] = useState({
-    name: '',
-    number: '',
-  });
-
-  const handleChange = ({ target }) => {
-    const { name, value } = target;
-    setForm({
-      ...form,
-      [name]: value,
-    });
-  };
-
-  const data = useSelector(getContacts);
+  const contacts = useSelector(getContacts);
+  const filteredContacts = useSelector(getFilteredContacts);
 
   const dispatch = useDispatch();
 
-  const handleSubmit = () => {
-    const searchedName = form.name.toLowerCase();
+  const addContact = ({ name, number }) => {
+    const searchedName = name.toLowerCase();
 
-    if (data.some(element => element.name.toLowerCase() === searchedName)) {
-      return alert(`${form.name} is already in contacts.`);
+    if (contacts.some(element => element.name.toLowerCase() === searchedName)) {
+      return alert(`${name} is already in contacts.`);
     }
-    dispatch(actionCreators.addContact(form));
+    dispatch(actionCreators.addContact({ name, number }));
+  };
+
+  const removeContact = id => {
+    dispatch(actionCreators.removeContact(id));
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        <label htmlFor="name">Name</label>
-        <input
-          onChange={handleChange}
-          type="text"
-          name="name"
-          value={form.name}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-          required
-        />
-        <label htmlFor="number">Number</label>
-        <input
-          onChange={handleChange}
-          type="tel"
-          name="number"
-          value={form.number}
-          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-          required
-        />
-        <button type="submit">Add contact</button>
-      </form>
+      <Form onSubmit={addContact} />
+      <h3>Contacts</h3>
+      <Filter />
+      <ContactsList
+        filteredContacts={filteredContacts}
+        removeContact={removeContact}
+      />
     </div>
   );
 };
